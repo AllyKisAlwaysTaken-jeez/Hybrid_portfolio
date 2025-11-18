@@ -1,6 +1,5 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from transformers import pipeline
 from datetime import datetime
 from functools import wraps
 from database import SessionLocal, engine, Base
