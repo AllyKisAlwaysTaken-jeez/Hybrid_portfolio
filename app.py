@@ -1,163 +1,140 @@
-import os
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from transformers import pipeline
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from datetime import datetime
-from functools import wraps
 from database import SessionLocal, engine, Base
-from models import PageContent, User
+from models import PageContent
+import os
 
-
-# DATABASE SETUP
+app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret")
 
 Base.metadata.create_all(bind=engine)
 
-# Pre-populate required sections
-def populate_sections():
+# Utility: fetch content from database or fallback text
+def get_content(page_name, fallback):
     db = SessionLocal()
-    default_sections = {
-        "home": "Welcome to my AI-managed portfolio! I’m passionate about technology, innovation, and building impactful solutions.",
-        "about": "I am a Computer Science postgraduate specializing in AI and software development.",
-        "projects": "This section highlights my portfolio projects and technical work, including apps, tools, and research projects.",
-        "contact": "Feel free to reach out through email, LinkedIn, or my contact form. Email: example@outlook.com"
-    }
-    for section, content in default_sections.items():
-        existing = db.query(PageContent).filter(PageContent.section == section).first()
-        if not existing:
-            db.add(PageContent(section=section, content=content))
-    db.commit()
+    page = db.query(PageContent).filter_by(page_name=page_name).first()
     db.close()
-
-populate_sections()  # Runs automatically on app start
-
-
-# FLASK APP
-
-app = Flask(__name__)
-app.secret_key = "supersecretkey"  # Change in production
-app.config["TEMPLATES_AUTO_RELOAD"] = True
+    return page.content if page else fallback
 
 
-# AGENT AI (OpenAI API)
+# Main Public Pages
 
-import requests
-
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-def generate_text(prompt: str, max_length: int = 180) -> str:
-    if not OPENAI_API_KEY:
-        return "❌ Missing API key. Please set your OPENAI_API_KEY environment variable."
-
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": "gpt-4o-mini",
-        "messages": [
-            {"role": "system", "content": "You are a portfolio content rewriting assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        "temperature": 0.7,
-        "max_tokens": max_length
-    }
-
-    response = requests.post(url, headers=headers, json=payload)
-    try:
-        data = response.json()
-    except Exception as e:
-        return f"❌ Failed to parse API response: {str(e)}"
-    if "error" in data:
-        return f"❌ OpenAI API error: {data['error'].get('message', 'Unknown error')}"
-    if "choices" not in data or len(data["choices"]) == 0:
-        return f"❌ Unexpected API response: {data}"
-    return data["choices"][0]["message"]["content"]
-
-
-# HELPER FUNCTIONS
-
-def save_content(section, text):
-    db = SessionLocal()
-    existing = db.query(PageContent).filter(PageContent.section == section).first()
-    if existing:
-        existing.content = text
-    else:
-        db.add(PageContent(section=section, content=text))
-    db.commit()
-    db.close()
-
-def get_content(section, default_text):
-    db = SessionLocal()
-    entry = db.query(PageContent).filter(PageContent.section == section).first()
-    db.close()
-    return entry.content if entry else default_text
-
-def login_required(f):
-    from functools import wraps
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if "user" not in session:
-            flash("Please log in to access the dashboard.", "warning")
-            return redirect(url_for("login"))
-        return f(*args, **kwargs)
-    return decorated
-
-
-# ROUTES
 
 @app.route("/")
 def home():
-    home_intro = get_content("home", "Welcome to my AI-managed portfolio!")
-    return render_template("index.html", home_intro=home_intro, current_year=datetime.now().year)
+    home_content = get_content("home", "Welcome to my portfolio website!")
+    return render_template("index.html",
+                           home_content=home_content,
+                           current_year=datetime.now().year)
+
+
+@app.route("/about")
+def about():
+    about_content = get_content(
+        "about", 
+        "I am a Computer Science postgraduate specializing in AI and software development."
+    )
+    return render_template("about.html",
+                           about_content=about_content,
+                           current_year=datetime.now().year)
+
+
+@app.route("/projects")
+def projects():
+    projects_content = get_content(
+        "projects", 
+        "Here are some projects I’ve been working on."
+    )
+    return render_template("projects.html",
+                           projects_content=projects_content,
+                           current_year=datetime.now().year)
+
+
+@app.route("/contact")
+def contact():
+    contact_content = get_content(
+        "contact", 
+        "You can reach me through email or my social accounts."
+    )
+    return render_template("contact.html",
+                           contact_content=contact_content,
+                           current_year=datetime.now().year)
+
+
+
+# Dashboard + Login
+
 
 @app.route("/dashboard")
-@login_required
 def dashboard():
-    return render_template("dashboard.html", current_year=datetime.now().year)
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
 
-@app.route("/ai-rewrite", methods=["GET", "POST"])
-@login_required
-def ai_rewrite():
-    rewritten_text = None
-    if request.method == "POST":
-        section = request.form["section"]
-        job_role = request.form["job_role"]
-        keywords = request.form.get("keywords", "")
-        project_info = request.form.get("project_info", "")
-        prompt = (
-            f"Rewrite the '{section}' section of a portfolio website for someone applying "
-            f"as a {job_role}. Use these keywords: {keywords}. "
-            f"Include project details if relevant: {project_info}. "
-            f"Tone: professional, engaging, clear."
-        )
-        rewritten_text = generate_text(prompt, max_length=300)
-        flash("AI-generated text created!", "success")
-        save_content(section, rewritten_text)
-    return render_template("dashboard.html", rewritten_text=rewritten_text, current_year=datetime.now().year)
+    db = SessionLocal()
+    pages = db.query(PageContent).all()
+    db.close()
 
+    return render_template("dashboard.html",
+                           pages=pages,
+                           current_year=datetime.now().year)
 
-# LOGIN / LOGOUT
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        db = SessionLocal()
-        user = db.query(User).filter(User.username==username, User.password==password).first()
-        db.close()
-        if user:
-            session["user"] = username
-            flash("Logged in successfully!", "success")
+        if request.form["password"] == os.environ.get("ADMIN_PASSWORD", "admin"):
+            session["logged_in"] = True
             return redirect(url_for("dashboard"))
-        flash("Invalid username or password.", "danger")
+        return render_template("login.html", error="Incorrect password.")
+
     return render_template("login.html")
+
 
 @app.route("/logout")
 def logout():
-    session.pop("user", None)
-    flash("You have been logged out.", "info")
+    session.clear()
     return redirect(url_for("home"))
 
+
+
+# Hybrid Agent + Assistant APIs
+
+
+@app.route("/ai-rewrite", methods=["POST"])
+def ai_rewrite():
+    """Agent rewrites portfolio sections."""
+    data = request.json
+    page = data.get("page")
+    content = data.get("content")
+
+    db = SessionLocal()
+    page_model = db.query(PageContent).filter_by(page_name=page).first()
+
+    if not page_model:
+        page_model = PageContent(page_name=page, content=content)
+        db.add(page_model)
+    else:
+        page_model.content = content
+
+    db.commit()
+    db.close()
+
+    return jsonify({"message": "Content saved", "page": page})
+
+
+@app.route("/assistant-advice", methods=["POST"])
+def assistant_advice():
+    """Assistant gives feedback (this returns text only)."""
+    data = request.json
+    user_text = data.get("content")
+
+    feedback = (
+        "Great start! Try adding more measurable achievements and consider "
+        "including a short intro sentence to add personality."
+    )
+
+    return jsonify({"advice": feedback})
+
+
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=5000)

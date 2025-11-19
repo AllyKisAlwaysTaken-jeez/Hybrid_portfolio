@@ -1,41 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard - AI Portfolio Hybrid</title>
-  <link rel="stylesheet" href="/static/styles.css">
+    <title>Dashboard</title>
 </head>
 <body>
-  <header>
-    <h1>Dashboard</h1>
-    <nav>
-      <a href="/">Home</a> |
-      <a href="/logout">Logout</a>
-    </nav>
-  </header>
+<h1>Dashboard</h1>
 
-  <main>
-    <section class="ai-box">
-      <h2>Rewrite Portfolio Section (Agent)</h2>
-      <form method="post" action="/ai-rewrite">
-        <label>Section: <input type="text" name="section" required></label><br>
-        <label>Job Role: <input type="text" name="job_role" required></label><br>
-        <label>Keywords: <input type="text" name="keywords"></label><br>
-        <label>Project Info: <input type="text" name="project_info"></label><br>
-        <button type="submit">Generate Rewrite</button>
-      </form>
-      {% if rewritten_text %}
-        <div class="ai-output">
-          <strong>Rewritten Text:</strong>
-          <p>{{ rewritten_text }}</p>
-        </div>
-      {% endif %}
-    </section>
+<ul>
+    {% for page in pages %}
+        <li>{{ page.page_name }} → {{ page.content[:50] }}...</li>
+    {% endfor %}
+</ul>
 
-    <section class="ai-box">
-      <h2>Get AI Portfolio Advice (Assistant)</h2>
-      <form id="chat-form">
-        <label>Industry: <input type="text" id="industry" required></label><br>
-        <label>Style: <input type="text" id="style" required></label><br>
-        <label>Goals: <input type="text" id="goals" required></label><br>
-        <label>Competitor URLs (com
+<a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>
