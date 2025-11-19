@@ -140,11 +140,6 @@ def ai_assistant():
     )
     return jsonify({"advice": advice})
 
-@app.route("/generate-portfolio", methods=["POST"])
-def generate_portfolio():
-
-    return jsonify({"status": "success"})
-
 
 @app.route("/generate-portfolio", methods=["POST"])
 def generate_portfolio():
