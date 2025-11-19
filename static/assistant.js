@@ -5,20 +5,15 @@ const generateBtn = document.getElementById("generate-portfolio");
 chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const industry = document.getElementById("industry").value;
-  const style = document.getElementById("style").value;
-  const goals = document.getElementById("goals").value;
-  const competitors = document.getElementById("competitors").value;
+  const industry = document.getElementById("industry").value.trim();
+  const style = document.getElementById("style").value.trim();
+  const goals = document.getElementById("goals").value.trim();
+  const competitors = document.getElementById("competitors").value.trim();
 
-  // Add user message to chat
-  const userMessage = document.createElement("div");
-  userMessage.className = "message user";
-  userMessage.innerText = `Industry: ${industry}, Style: ${style}, Goals: ${goals}`;
-  chatBox.appendChild(userMessage);
+  if (!industry || !style || !goals) return;
 
-  chatBox.scrollTop = chatBox.scrollHeight;
+  addMessage(`Industry: ${industry}, Style: ${style}, Goals: ${goals}`, "user");
 
-  // Send to Flask assistant
   const response = await fetch("/ai-assistant", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -26,38 +21,26 @@ chatForm.addEventListener("submit", async (e) => {
   });
 
   const data = await response.json();
+  addMessage(data.advice, "bot");
 
-  // Add bot advice to chat
-  const botMessage = document.createElement("div");
-  botMessage.className = "message bot";
-  botMessage.innerText = data.advice;
-  chatBox.appendChild(botMessage);
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  // Show the generate portfolio button
+  // Show the generate button after first assistant advice
   generateBtn.style.display = "block";
+
+  chatForm.reset();
 });
 
-// Handle Generate Portfolio button
 generateBtn.addEventListener("click", async () => {
-  const industry = document.getElementById("industry").value;
-  const style = document.getElementById("style").value;
-  const goals = document.getElementById("goals").value;
-  const competitors = document.getElementById("competitors").value;
-
-  const response = await fetch("/generate-portfolio", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ industry, style, goals, competitors })
-  });
-
+  const response = await fetch("/generate-portfolio", { method: "POST" });
   const data = await response.json();
-
-  const botMessage = document.createElement("div");
-  botMessage.className = "message bot";
-  botMessage.innerText = "✅ Portfolio generated successfully!";
-  chatBox.appendChild(botMessage);
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  generateBtn.style.display = "none"; // hide button again
+  if (data.status === "success") {
+    addMessage("🚀 Portfolio generation triggered!", "bot");
+  }
 });
+
+function addMessage(text, sender) {
+  const div = document.createElement("div");
+  div.classList.add("message", sender);
+  div.innerHTML = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}

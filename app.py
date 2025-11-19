@@ -121,20 +121,6 @@ def ai_rewrite():
 
     return jsonify({"message": "Content saved", "page": page})
 
-
-@app.route("/assistant-advice", methods=["POST"])
-def assistant_advice():
-    """Assistant gives feedback (this returns text only)."""
-    data = request.json
-    user_text = data.get("content")
-
-    feedback = (
-        "Great start! Try adding more measurable achievements and consider "
-        "including a short intro sentence to add personality."
-    )
-
-    return jsonify({"advice": feedback})
-
 # Keeping assistant and agent separate
 
 @app.route("/assistant")
@@ -144,9 +130,21 @@ def assistant_page():
 @app.route("/ai-assistant", methods=["POST"])
 def ai_assistant():
     data = request.get_json()
-    # Example AI response logic
-    advice = f"Based on your industry ({data['industry']}), style ({data['style']}), and goals ({data['goals']}), I recommend a modern, responsive portfolio."
+    industry = data.get("industry")
+    style = data.get("style")
+    goals = data.get("goals")
+
+    advice = (
+        f"Based on your industry ({industry}), style ({style}), "
+        f"and goals ({goals}), I recommend a modern, responsive portfolio."
+    )
     return jsonify({"advice": advice})
+
+@app.route("/generate-portfolio", methods=["POST"])
+def generate_portfolio():
+
+    return jsonify({"status": "success"})
+
 
 @app.route("/generate-portfolio", methods=["POST"])
 def generate_portfolio():
