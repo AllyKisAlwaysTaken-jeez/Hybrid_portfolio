@@ -135,6 +135,23 @@ def assistant_advice():
 
     return jsonify({"advice": feedback})
 
+# keeping assistant and agent separate
+
+@app.route("/assistant")
+def assistant_page():
+    return render_template("assistant.html")
+
+@app.route("/ai-assistant", methods=["POST"])
+def ai_assistant():
+    data = request.get_json()
+    # Example AI response logic
+    advice = f"Based on your industry ({data['industry']}), style ({data['style']}), and goals ({data['goals']}), I recommend a modern, responsive portfolio."
+    return jsonify({"advice": advice})
+
+@app.route("/generate-portfolio", methods=["POST"])
+def generate_portfolio():
+    # Trigger your existing portfolio generation logic here
+    return jsonify({"status": "success"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

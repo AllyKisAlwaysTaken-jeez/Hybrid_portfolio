@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Portfolio Assistant</title>
-  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/assistant.css" />
 </head>
 <body>
   <div class="chat-container">
@@ -15,19 +15,21 @@
 
     <div id="chat-box" class="chat-box">
       <div class="message bot">
-        👋 Hi there! Tell me your <strong>industry</strong>, <strong>style</strong>, and <strong>goals</strong>, and I’ll help you build the perfect portfolio.
+        👋 Hi! Tell me your <strong>industry</strong>, <strong>style</strong>, and <strong>goals</strong>, and I’ll help you build your portfolio.
       </div>
     </div>
 
     <form id="chat-form" class="chat-form">
       <input type="text" id="industry" placeholder="Industry (e.g., Tech)" required />
       <input type="text" id="style" placeholder="Style (e.g., Minimalist, Modern)" required />
-      <input type="text" id="goals" placeholder="Goals (e.g., Attract freelance clients)" required />
+      <input type="text" id="goals" placeholder="Goals (e.g., Attract clients)" required />
       <input type="text" id="competitors" placeholder="Competitor URLs (comma-separated)" />
       <button type="submit">Send</button>
     </form>
+
+    <button id="generate-portfolio" style="display:none;">🚀 Generate Portfolio</button>
   </div>
 
-  <script src="/static/script.js"></script>
+  <script src="/static/assistant.js"></script>
 </body>
 </html>
