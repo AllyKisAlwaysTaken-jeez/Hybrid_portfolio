@@ -1,0 +1,7 @@
+[tool.poetry]
+name = "Hybrid_Portfolio"
+version = "0.1.0"
+description = "hybrid portfolio"
+authors = ["AllyKisAlwaysTaken-jeez"]
+# Force Python version
+python = "3.12.3"
