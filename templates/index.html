@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>AI Portfolio Hybrid</title>
-  <link rel="stylesheet" href="/static/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Correct CSS reference -->
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <header>
@@ -20,41 +22,43 @@
   <main>
     <section>
       <h2>Portfolio Introduction</h2>
-      <p>{{ home_intro }}</p>
+      <p>{{ home_content }}</p>
     </section>
 
-    <section id="ai-panel">
+    <section id="ai-tools">
       <h2>AI Portfolio Tools</h2>
 
-      <!-- Agent Rewrite Form -->
-      <div class="ai-box">
-        <h3>Rewrite Portfolio Section</h3>
-        <form id="rewrite-form" method="post" action="/ai-rewrite">
-          <label>Section: <input type="text" name="section" required></label><br>
-          <label>Job Role: <input type="text" name="job_role" required></label><br>
-          <label>Keywords: <input type="text" name="keywords"></label><br>
-          <label>Project Info: <input type="text" name="project_info"></label><br>
-          <button type="submit">Generate Rewrite</button>
-        </form>
-        {% if rewritten_text %}
+      <div class="ai-panel">
+        <!-- Agent Rewrite Form -->
+        <div class="ai-box">
+          <h3>Rewrite Portfolio Section</h3>
+          <form id="rewrite-form" method="post" action="/ai-rewrite">
+            <label>Section: <input type="text" name="section" required></label><br>
+            <label>Job Role: <input type="text" name="job_role" required></label><br>
+            <label>Keywords: <input type="text" name="keywords"></label><br>
+            <label>Project Info: <input type="text" name="project_info"></label><br>
+            <button type="submit">Generate Rewrite</button>
+          </form>
+          {% if rewritten_text %}
           <div class="ai-output">
             <strong>Rewritten Text:</strong>
             <p>{{ rewritten_text }}</p>
           </div>
-        {% endif %}
-      </div>
+          {% endif %}
+        </div>
 
-      <!-- Assistant Advice Chat -->
-      <div class="ai-box">
-        <h3>Get AI Portfolio Advice</h3>
-        <form id="chat-form">
-          <label>Industry: <input type="text" id="industry" required></label><br>
-          <label>Style: <input type="text" id="style" required></label><br>
-          <label>Goals: <input type="text" id="goals" required></label><br>
-          <label>Competitor URLs (comma separated): <input type="text" id="competitors"></label><br>
-          <button type="submit">Get Advice</button>
-        </form>
-        <div id="chat-box"></div>
+        <!-- Assistant Advice Chat -->
+        <div class="ai-box">
+          <h3>Get AI Portfolio Advice</h3>
+          <form id="chat-form">
+            <label>Industry: <input type="text" id="industry" required></label><br>
+            <label>Style: <input type="text" id="style" required></label><br>
+            <label>Goals: <input type="text" id="goals" required></label><br>
+            <label>Competitor URLs: <input type="text" id="competitors"></label><br>
+            <button type="submit">Get Advice</button>
+          </form>
+          <div id="chat-box" class="chat-box"></div>
+        </div>
       </div>
     </section>
   </main>
@@ -63,6 +67,7 @@
     <p>© {{ current_year }} AI Portfolio Hybrid</p>
   </footer>
 
-  <script src="/static/js/script.js"></script>
+  <!-- Correct JS reference -->
+  <script src="/static/script.js"></script>
 </body>
 </html>
