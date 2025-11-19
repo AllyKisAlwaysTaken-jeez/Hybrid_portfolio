@@ -18,15 +18,12 @@ def get_content(page_name, fallback):
 
 
 # Main Public Pages
-
-
 @app.route("/")
 def home():
     home_content = get_content("home", "Welcome to my portfolio website!")
     return render_template("index.html",
                            home_content=home_content,
                            current_year=datetime.now().year)
-
 
 @app.route("/about")
 def about():
@@ -38,7 +35,6 @@ def about():
                            about_content=about_content,
                            current_year=datetime.now().year)
 
-
 @app.route("/projects")
 def projects():
     projects_content = get_content(
@@ -48,7 +44,6 @@ def projects():
     return render_template("projects.html",
                            projects_content=projects_content,
                            current_year=datetime.now().year)
-
 
 @app.route("/contact")
 def contact():
@@ -61,10 +56,7 @@ def contact():
                            current_year=datetime.now().year)
 
 
-
 # Dashboard + Login
-
-
 @app.route("/dashboard")
 def dashboard():
     if not session.get("logged_in"):
@@ -78,7 +70,6 @@ def dashboard():
                            pages=pages,
                            current_year=datetime.now().year)
 
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -86,9 +77,7 @@ def login():
             session["logged_in"] = True
             return redirect(url_for("dashboard"))
         return render_template("login.html", error="Incorrect password.")
-
     return render_template("login.html")
-
 
 @app.route("/logout")
 def logout():
@@ -96,10 +85,7 @@ def logout():
     return redirect(url_for("home"))
 
 
-
-# Hybrid Agent + Assistant APIs
-
-
+# Hybrid Agent
 @app.route("/ai-rewrite", methods=["POST"])
 def ai_rewrite():
     """Agent rewrites portfolio sections."""
@@ -108,10 +94,10 @@ def ai_rewrite():
     content = data.get("content")
 
     db = SessionLocal()
-    page_model = db.query(PageContent).filter_by(page_name=page).first()
+    page_model = db.query(PageContent).filter_by(section=page).first()
 
     if not page_model:
-        page_model = PageContent(page_name=page, content=content)
+        page_model = PageContent(section=page, content=content)
         db.add(page_model)
     else:
         page_model.content = content
@@ -121,10 +107,11 @@ def ai_rewrite():
 
     return jsonify({"message": "Content saved", "page": page})
 
-# Keeping assistant and agent separate
 
+# Assistant: Separate Flow
 @app.route("/assistant")
 def assistant_page():
+    """Assistant-first page."""
     return render_template("assistant.html")
 
 @app.route("/ai-assistant", methods=["POST"])
@@ -140,10 +127,9 @@ def ai_assistant():
     )
     return jsonify({"advice": advice})
 
-
 @app.route("/generate-portfolio", methods=["POST"])
 def generate_portfolio():
-    data = request.json
+    data = request.get_json()
     industry = data.get("industry")
     style = data.get("style")
     goals = data.get("goals")
@@ -151,6 +137,7 @@ def generate_portfolio():
 
     print(f"Generating portfolio for {industry}, {style}, {goals}, competitors: {competitors}")
 
+    # Placeholder: you can call your actual generation logic here
     return jsonify({"status": "success"})
 
 
