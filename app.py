@@ -12,7 +12,7 @@ Base.metadata.create_all(bind=engine)
 # Utility: fetch content from database or fallback text
 def get_content(page_name, fallback):
     db = SessionLocal()
-    page = db.query(PageContent).filter_by(page_name=page_name).first()
+    page = db.query(PageContent).filter_by(section=page_name).first()
     db.close()
     return page.content if page else fallback
 
