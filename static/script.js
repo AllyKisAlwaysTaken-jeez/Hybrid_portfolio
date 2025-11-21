@@ -89,34 +89,27 @@ form.addEventListener("submit", async (e) => {
 });
 
 // AI Rewrite Handler
-document.getElementById("rewrite-form").addEventListener("submit", async (e) => {
+document.getElementById("rewrite-form").addEventListener("submit", async function(e) {
   e.preventDefault();
 
-  const section = document.getElementById("section").value;
-  const job_role = document.getElementById("job_role").value;
-  const keywords = document.getElementById("keywords").value;
-  const project_info = document.getElementById("project_info").value;
-
   const payload = {
-      section,
-      job_role,
-      keywords,
-      project_info
+      section: document.getElementById("section").value,
+      job_role: document.getElementById("job_role").value,
+      keywords: document.getElementById("keywords").value,
+      project_info: document.getElementById("project_info").value
   };
 
   const response = await fetch("/ai-rewrite", {
       method: "POST",
-      headers: {
-          "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
   });
 
   const data = await response.json();
 
-  // Show rewritten text
   document.getElementById("rewrite-output").innerHTML = `
       <strong>Rewritten Text:</strong>
       <p>${data.rewritten_text}</p>
   `;
 });
+
