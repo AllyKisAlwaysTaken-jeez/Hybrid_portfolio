@@ -88,27 +88,23 @@ def logout():
 # Hybrid Agent
 @app.route("/ai-rewrite", methods=["POST"])
 def ai_rewrite():
-    """Agent rewrites portfolio sections using normal form-data."""
-    section = request.form.get("section")
-    job_role = request.form.get("job_role")
-    keywords = request.form.get("keywords")
-    project_info = request.form.get("project_info")
+    data = request.json
 
-    # ----- Your rewrite logic (placeholder for now) -----
-    rewritten_text = (
-        f"<strong>{section}</strong> updated for the role of {job_role}. "
-        f"Focused on keywords: {keywords}. "
-        f"Includes project details: {project_info}."
+    section = data.get("section")
+    job_role = data.get("job_role")
+    keywords = data.get("keywords")
+    project_info = data.get("project_info")
+
+    # ✨ TEMP: Fake rewrite so you can verify it works
+    rewritten = (
+        f"This is an improved version of your {section} section. "
+        f"As a {job_role}, you should highlight keywords such as {keywords}. "
+        f"Your project experience includes: {project_info}."
     )
 
-    return render_template(
-        "ai_result.html",
-        section=section,
-        rewritten_text=rewritten_text,
-        current_year=datetime.now().year
-    )
-
-
+    return jsonify({
+        "rewritten_text": rewritten
+    })
 
 
 # Assistant: Separate Flow
