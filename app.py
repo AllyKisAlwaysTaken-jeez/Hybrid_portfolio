@@ -88,24 +88,27 @@ def logout():
 # Hybrid Agent
 @app.route("/ai-rewrite", methods=["POST"])
 def ai_rewrite():
-    """Agent rewrites portfolio sections."""
-    data = request.json
-    page = data.get("page")
-    content = data.get("content")
+    """Agent rewrites portfolio sections using normal form-data."""
+    section = request.form.get("section")
+    job_role = request.form.get("job_role")
+    keywords = request.form.get("keywords")
+    project_info = request.form.get("project_info")
 
-    db = SessionLocal()
-    page_model = db.query(PageContent).filter_by(section=page).first()
+    # ----- Your rewrite logic (placeholder for now) -----
+    rewritten_text = (
+        f"<strong>{section}</strong> updated for the role of {job_role}. "
+        f"Focused on keywords: {keywords}. "
+        f"Includes project details: {project_info}."
+    )
 
-    if not page_model:
-        page_model = PageContent(section=page, content=content)
-        db.add(page_model)
-    else:
-        page_model.content = content
+    return render_template(
+        "ai_result.html",
+        section=section,
+        rewritten_text=rewritten_text,
+        current_year=datetime.now().year
+    )
 
-    db.commit()
-    db.close()
 
-    return jsonify({"message": "Content saved", "page": page})
 
 
 # Assistant: Separate Flow

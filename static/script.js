@@ -18,10 +18,36 @@ function addLoadingBubble() {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+
 function removeLoadingBubble() {
   const loading = document.getElementById("loading");
   if (loading) loading.remove();
 }
+
+document.getElementById("rewrite-form").addEventListener("submit", async function (e) {
+  e.preventDefault(); // Stop form reload
+
+  const data = {
+      page: document.getElementById("section").value,
+      content: {
+          role: document.getElementById("job_role").value,
+          keywords: document.getElementById("keywords").value,
+          project: document.getElementById("project_info").value
+      }
+  };
+
+  const response = await fetch("/ai-rewrite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+  });
+
+  const result = await response.json();
+
+  document.getElementById("rewrite-output").innerHTML =
+      `<p><strong>Saved:</strong> ${result.page}</p>`;
+});
+
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();

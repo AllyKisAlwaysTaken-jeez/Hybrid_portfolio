@@ -32,13 +32,28 @@
         <!-- Agent Rewrite Form -->
         <div class="ai-box">
           <h3>Rewrite Portfolio Section</h3>
-          <form id="rewrite-form" method="post" action="/ai-rewrite">
-            <label>Section: <input type="text" name="section" required></label><br>
-            <label>Job Role: <input type="text" name="job_role" required></label><br>
-            <label>Keywords: <input type="text" name="keywords"></label><br>
-            <label>Project Info: <input type="text" name="project_info"></label><br>
+          <form id="rewrite-form">
+            <label>Section:
+              <input type="text" id="section" required>
+            </label><br>
+          
+            <label>Job Role:
+              <input type="text" id="job_role" required>
+            </label><br>
+          
+            <label>Keywords:
+              <input type="text" id="keywords">
+            </label><br>
+          
+            <label>Project Info:
+              <input type="text" id="project_info">
+            </label><br>
+          
             <button type="submit">Generate Rewrite</button>
           </form>
+          
+          <div id="rewrite-output"></div>
+          
           {% if rewritten_text %}
           <div class="ai-output">
             <strong>Rewritten Text:</strong>
